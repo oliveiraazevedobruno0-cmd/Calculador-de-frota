@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculador de Frota por Destino</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .option-btn {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .option-btn:hover {
+            border-color: #667eea;
+            background: #f5f5f5;
+        }
+
+        .option-btn.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .summary-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .relatorio {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 8px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .relatorio h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .relatorio-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .relatorio-section:last-child {
+            border-bottom: none;
+        }
+
+        .relatorio-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .relatorio-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            color: #333;
+        }
+
+        .resultado-box {
+            background: white;
+            border-left: 4px solid #4caf50;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .resultado-box.warning {
+            border-left-color: #ff9800;
+        }
+
+        .resultado-box.error {
+            border-left-color: #ff6b6b;
+        }
+
+        .resultado-box h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .resultado-box p {
+            color: #666;
+        }
+
+        .info-text {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            color: #1565c0;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            align-items: center;
+        }
+
+        .progress-step {
+            flex: 1;
+            height: 40px;
+            background: #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #999;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .progress-step.completed {
+            background: #4caf50;
+            color: white;
+        }
+
+        .step-arrow {
+            color: #ccc;
+            font-size: 1.5em;
+            padding: 0 5px;
+        }
+
+        .row-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .destino-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 15px;
+        }
+
+        .destino-card h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .destino-card p {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        .btn-remove {
+            background: #ff6b6b;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-remove:hover {
+            background: #ff5252;
+        }
+
+        .custo-destaque {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .custo-destaque h3 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .custo-valor {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .custo-por-unidade {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .custo-por-unidade h3 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .custo-unidade-valor {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .row-inputs {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚚 Calculador de Frota</h1>
+            <p>Dimensionamento inteligente de equipamentos por destino</p>
+        </div>
+
+        <div class="content">
+            <!-- Progress Bar -->
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-step active" id="step0">0️⃣ Tipo</div>
+                <div class="step-arrow">→</div>
+                <div class="progress-step" id="step1">1️⃣ Intervalo</div>
+                <div class="step-arrow">→</div>
+                <div class="progress-step" id="step2">2️⃣ Destinos</div>
+                <div class="step-arrow">→</div>
+                <div class="progress-step" id="step3">3️⃣ Equipamentos</div>
+            </div>
+
+            <!-- BLOCO 0: Tipo de Prazo -->
+            <div class="section active" id="bloco0">
+                <div class="section-title">
+                    <div class="section-number">0️⃣</div>
+                    <div>Escolha o Tipo de Cálculo</div>
+                </div>
+
+                <div class="options">
+                    <button class="option-btn" onclick="selectTipoPrazo('curto', this)">
+                        <div style="font-size: 1.5em; margin-bottom: 5px;">📅</div>
+                        Curto Prazo<br>
+                        <small>(dias/semanas)</small>
+                    </button>
+                    <button class="option-btn" onclick="selectTipoPrazo('longo', this)">
+                        <div style="font-size: 1.5em; margin-bottom: 5px;">📆</div>
+                        Longo Prazo<br>
+                        <small>(meses/anos)</small>
+                    </button>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="nextStep(1)">Continuar →</button>
+                </div>
+            </div>
+
+            <!-- BLOCO 1: Intervalo e Horas -->
+            <div class="section" id="bloco1">
+                <div class="section-title">
+                    <div class="section-number">1️⃣</div>
+                    <div>Intervalo e Horas de Trabalho</div>
+                </div>
+
+                <div class="info-text">
+                    💡 Configure o período de tempo e as horas de operação diária
+                </div>
+
+                <div class="form-group">
+                    <label>Unidade de Medida</label>
+                    <div class="options">
+                        <button class="option-btn selected" onclick="selectUnidade('m3', this)">m³ (Volume)</button>
+                        <button class="option-btn" onclick="selectUnidade('ton', this)">ton (Toneladas)</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Intervalo de Tempo</label>
+                    <div id="intervaloOptions" class="options"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Dias Específicos (se aplicável)</label>
+                    <input type="number" id="diasEspecificos" placeholder="Ex: 5" min="1">
+                </div>
+
+                <div class="form-group">
+                    <label>Horas de Trabalho por Dia</label>
+                    <div class="options">
+                        <button class="option-btn" onclick="selectHoras(8, this)">8h (1 turno)</button>
+                        <button class="option-btn" onclick="selectHoras(12, this)">12h (1,5 turnos)</button>
+                        <button class="option-btn" onclick="selectHoras(16, this)">16h (2 turnos)</button>
+                        <button class="option-btn" onclick="selectHoras(24, this)">24h (Contínuo)</button>
+                    </div>
+                </div>
+
+                <div id="resumoBloco1" class="summary-box hidden">
+                    <div class="summary-item">
+                        <span>Intervalo:</span>
+                        <strong id="resumoIntervalo">-</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Horas por dia:</span>
+                        <strong id="resumoHoras">-</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total de horas:</span>
+                        <strong id="resumoTotalHoras">-</strong>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="previousStep(0)">← Voltar</button>
+                    <button class="btn-primary" onclick="nextStep(2)">Continuar →</button>
+                </div>
+            </div>
+
+            <!-- BLOCO 2: Selecionar Destinos -->
+            <div class="section" id="bloco2">
+                <div class="section-title">
+                    <div class="section-number">2️⃣</div>
+                    <div>Adicionar Destinos</div>
+                </div>
+
+                <div class="info-text">
+                    💡 Selecione o destino e preencha os dados de produção e operação
+                </div>
+
+                <div class="form-group">
+                    <label>Escolha um Destino</label>
+                    <select id="selectDestino" onchange="atualizarCamposDestino()">
+                        <option value="">-- Selecione um destino --</option>
+                        <option value="galp_pdr">🏭 Galpão de Rejeito → PDR Definitiva</option>
+                        <option value="galp_pde02">🏭 Galpão de Rejeito → PDE 02</option>
+                        <option value="galp_pastefill">🏭 Galpão de Rejeito → Pastefill</option>
+                        <option value="wetland_pde02">💧 Wetland 411 → PDE 02</option>
+                        <option value="wetland_gold">💧 Wetland 411 → Área gold</option>
+                        <option value="pde02_pdr">📍 PDE 02 → PDR Definitiva</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Produção Requerida</label>
+                    <input type="number" id="producaoDestino" placeholder="Ex: 200" min="0.01" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label>Tempo de Ciclo</label>
+                    <div class="row-inputs">
+                        <input type="number" id="tempoDestino" placeholder="Ex: 40" min="0.01" step="0.01">
+                        <select id="unidadeTempoDestino">
+                            <option value="min">Minutos</option>
+                            <option value="h">Horas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Capacidade do Caminhão</label>
+                    <input type="number" id="capacidadeDestino" placeholder="Ex: 15" min="0.01" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label>Eficiência Operacional (%)</label>
+                    <input type="number" id="eficienciaDestino" placeholder="Ex: 80" min="1" max="100" value="80">
+                </div>
+
+                <button class="btn-primary" onclick="adicionarDestinoSelecionado()" style="width: 100%;">+ Adicionar Destino</button>
+
+                <div id="destinosList" style="margin-top: 30px;">
+                    <h3 style="color: #333; margin-bottom: 15px;">Destinos Adicionados</h3>
+                    <div id="listDestinos">
+                        <p style="color: #999;">Nenhum destino adicionado ainda</p>
+                    </div>
+                </div>
+
+                <div class="button-group" style="margin-top: 30px;">
+                    <button class="btn-secondary" onclick="previousStep(1)">← Voltar</button>
+                    <button class="btn-primary" onclick="nextStep(3)" id="btnContinuarDestinos" disabled>Continuar →</button>
+                </div>
+            </div>
+
+            <!-- BLOCO 3: Equipamentos Disponíveis -->
+            <div class="section" id="bloco3">
+                <div class="section-title">
+                    <div class="section-number">3️⃣</div>
+                    <div>Equipamentos Disponíveis</div>
+                </div>
+
+                <div class="info-text">
+                    💡 Quantos equipamentos você tem disponível agora?
+                </div>
+
+                <div class="form-group">
+                    <label>Número de Equipamentos</label>
+                    <input type="number" id="equipamentosDisponiveis" placeholder="Ex: 5" min="0" value="0">
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="previousStep(2)">← Voltar</button>
+                    <button class="btn-primary" onclick="gerarRelatorio()">Gerar Relatório 📊</button>
+                </div>
+            </div>
+
+            <!-- BLOCO 4: Relatório -->
+            <div class="section" id="bloco4">
+                <div class="section-title">
+                    <div class="section-number">✅</div>
+                    <div>Relatório de Dimensionamento</div>
+                </div>
+
+                <div id="relatorioContent" class="relatorio"></div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="resetarCalculadora()">← Novo Cálculo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Constantes
+        const CUSTO_HORA = 278.09; // R$ por hora
+
+        // Estado global
+        let estado = {
+            tipoPrazo: null,
+            unidade: 'm3',
+            intervaloDias: 0,
+            horasTrabalhoDia: 0,
+            destinos: [],
+            equipamentosDisponiveis: 0
+        };
+
+        // Função para formatar unidade
+        function formatarUnidade(unidade) {
+            return unidade === 'm3' ? 'm³' : 'ton';
+        }
+
+        // Função para formatar moeda
+        function formatarMoeda(valor) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valor);
+        }
+
+        // Funções auxiliares
+        function showSection(numero) {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`bloco${numero}`).classList.add('active');
+            updateProgressBar(numero);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateProgressBar(current) {
+            for (let i = 0; i < 4; i++) {
+                const step = document.getElementById(`step${i}`);
+                if (i < current) {
+                    step.classList.remove('active');
+                    step.classList.add('completed');
+                } else if (i === current) {
+                    step.classList.remove('completed');
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            }
+        }
+
+        function nextStep(numero) {
+            if (numero === 1) {
+                if (!estado.tipoPrazo) {
+                    alert('Por favor, selecione o tipo de prazo');
+                    return;
+                }
+                gerarOpcoes();
+            }
+
+            if (numero === 2) {
+                if (estado.intervaloDias === 0 || estado.horasTrabalhoDia === 0) {
+                    alert('Por favor, preencha todos os campos obrigatórios');
+                    return;
+                }
+                updateResumoBloco1();
+            }
+
+            if (numero === 3) {
+                if (estado.destinos.length === 0) {
+                    alert('Por favor, adicione pelo menos um destino');
+                    return;
+                }
+            }
+
+            showSection(numero);
+        }
+
+        function previousStep(numero) {
+            showSection(numero);
+        }
+
+        function selectTipoPrazo(tipo, element) {
+            document.querySelectorAll('#bloco0 .option-btn').forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+            estado.tipoPrazo = tipo;
+        }
+
+        function selectUnidade(unidade, element) {
+            document.querySelectorAll('.form-group .option-btn').forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+            estado.unidade = unidade;
+        }
+
+        function selectHoras(horas, element) {
+            document.querySelectorAll('#bloco1 .options:last-child .option-btn').forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+            estado.horasTrabalhoDia = horas;
+        }
+
+        function gerarOpcoes() {
+            const container = document.getElementById('intervaloOptions');
+            container.innerHTML = '';
+
+            if (estado.tipoPrazo === 'curto') {
+                const opcoes = [
+                    { label: 'Hoje (1 dia)', value: 1 },
+                    { label: 'Alguns dias', value: 'custom' },
+                    { label: 'Uma semana (7 dias)', value: 7 }
+                ];
+
+                opcoes.forEach(op => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = op.label;
+                    btn.onclick = () => {
+                        if (op.value === 'custom') {
+                            document.getElementById('diasEspecificos').focus();
+                        } else {
+                            document.getElementById('diasEspecificos').value = '';
+                            estado.intervaloDias = op.value;
+                            document.querySelectorAll('#intervaloOptions .option-btn').forEach(b => b.classList.remove('selected'));
+                            btn.classList.add('selected');
+                        }
+                    };
+                    container.appendChild(btn);
+                });
+            } else {
+                const opcoes = [
+                    { label: 'Um mês (30 dias)', value: 30 },
+                    { label: 'Vários meses', value: 'custom' },
+                    { label: 'Um ano (365 dias)', value: 365 }
+                ];
+
+                opcoes.forEach(op => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = op.label;
+                    btn.onclick = () => {
+                        if (op.value === 'custom') {
+                            document.getElementById('diasEspecificos').focus();
+                        } else {
+                            document.getElementById('diasEspecificos').value = '';
+                            estado.intervaloDias = op.value;
+                            document.querySelectorAll('#intervaloOptions .option-btn').forEach(b => b.classList.remove('selected'));
+                            btn.classList.add('selected');
+                        }
+                    };
+                    container.appendChild(btn);
+                });
+            }
+        }
+
+        document.getElementById('diasEspecificos')?.addEventListener('change', function() {
+            if (this.value) {
+                estado.intervaloDias = parseInt(this.value);
+                document.querySelectorAll('#intervaloOptions .option-btn').forEach(b => b.classList.remove('selected'));
+            }
+        });
+
+        function updateResumoBloco1() {
+            const totalHoras = estado.intervaloDias * estado.horasTrabalhoDia;
+            document.getElementById('resumoIntervalo').textContent = `${estado.intervaloDias} dias`;
+            document.getElementById('resumoHoras').textContent = `${estado.horasTrabalhoDia}h`;
+            document.getElementById('resumoTotalHoras').textContent = `${totalHoras}h`;
+            document.getElementById('resumoBloco1').classList.remove('hidden');
+        }
+
+        function atualizarCamposDestino() {
+            document.getElementById('producaoDestino').value = '';
+            document.getElementById('tempoDestino').value = '';
+            document.getElementById('capacidadeDestino').value = '';
+            document.getElementById('eficienciaDestino').value = '80';
+            document.getElementById('unidadeTempoDestino').value = 'min';
+        }
+
+        function adicionarDestinoSelecionado() {
+            const selectElement = document.getElementById('selectDestino');
+            const producao = parseFloat(document.getElementById('producaoDestino').value);
+            const tempo = parseFloat(document.getElementById('tempoDestino').value);
+            const unidadeTempo = document.getElementById('unidadeTempoDestino').value;
+            const capacidade = parseFloat(document.getElementById('capacidadeDestino').value);
+            const eficiencia = parseFloat(document.getElementById('eficienciaDestino').value) || 80;
+            const destinoId = selectElement.value;
+
+            if (!destinoId) {
+                alert('Por favor, selecione um destino');
+                return;
+            }
+
+            if (isNaN(producao) || producao <= 0) {
+                alert('Por favor, defina uma produção válida');
+                return;
+            }
+
+            if (isNaN(tempo) || tempo <= 0) {
+                alert('Por favor, defina um tempo de ciclo válido');
+                return;
+            }
+
+            if (isNaN(capacidade) || capacidade <= 0) {
+                alert('Por favor, defina uma capacidade válida');
+                return;
+            }
+
+            if (estado.destinos.some(d => d.id === destinoId)) {
+                alert('Este destino já foi adicionado. Remova e adicione novamente se quiser alterar.');
+                return;
+            }
+
+            const tempoMinutos = unidadeTempo === 'h' ? tempo * 60 : tempo;
+            const nomeDestino = selectElement.options[selectElement.selectedIndex].text;
+
+            const destino = {
+                id: destinoId,
+                nome: nomeDestino,
+                producao,
+                tempoMinutos,
+                capacidade,
+                eficiencia: Math.min(eficiencia, 100)
+            };
+
+            estado.destinos.push(destino);
+            limparFormDestino();
+            atualizarListaDestinos();
+            document.getElementById('btnContinuarDestinos').disabled = false;
+        }
+
+        function removerDestino(id) {
+            estado.destinos = estado.destinos.filter(d => d.id !== id);
+            atualizarListaDestinos();
+            if (estado.destinos.length === 0) {
+                document.getElementById('btnContinuarDestinos').disabled = true;
+            }
+        }
+
+        function atualizarListaDestinos() {
+            const lista = document.getElementById('listDestinos');
+            if (estado.destinos.length === 0) {
+                lista.innerHTML = '<p style="color: #999;">Nenhum destino adicionado ainda</p>';
+                return;
+            }
+
+            lista.innerHTML = estado.destinos.map(destino => `
+                <div class="destino-card">
+                    <h4>${destino.nome}</h4>
+                    <p>📦 Produção: <strong>${destino.producao} ${formatarUnidade(estado.unidade)}</strong></p>
+                    <p>⏱️ Ciclo: <strong>${destino.tempoMinutos.toFixed(0)} min</strong> | Capacidade: <strong>${destino.capacidade} ${formatarUnidade(estado.unidade)}</strong> | Eficiência: <strong>${destino.eficiencia}%</strong></p>
+                    <button class="btn-remove" onclick="removerDestino('${destino.id}')">Remover</button>
+                </div>
+            `).join('');
+        }
+
+        function limparFormDestino() {
+            document.getElementById('selectDestino').value = '';
+            document.getElementById('producaoDestino').value = '';
+            document.getElementById('tempoDestino').value = '';
+            document.getElementById('capacidadeDestino').value = '';
+            document.getElementById('eficienciaDestino').value = '80';
+        }
+
+        document.getElementById('equipamentosDisponiveis')?.addEventListener('change', function() {
+            estado.equipamentosDisponiveis = parseInt(this.value) || 0;
+        });
+
+        function gerarRelatorio() {
+            const totalHoras = estado.intervaloDias * estado.horasTrabalhoDia;
+            const unidadeFormatada = formatarUnidade(estado.unidade);
+            let totalEquipamentosNecessarios = 0;
+            let html = `<h2>📊 Relatório de Dimensionamento de Frota</h2>`;
+
+            // Seção 1: Configuração Geral
+            html += `
+                <div class="relatorio-section">
+                    <h3>📅 Configuração Geral</h3>
+                    <div class="relatorio-item">
+                        <span>Intervalo:</span>
+                        <strong>${estado.intervaloDias} dias</strong>
+                    </div>
+                    <div class="relatorio-item">
+                        <span>Horas de trabalho por dia:</span>
+                        <strong>${estado.horasTrabalhoDia}h</strong>
+                    </div>
+                    <div class="relatorio-item">
+                        <span>Total de horas disponíveis:</span>
+                        <strong>${totalHoras} horas</strong>
+                    </div>
+                    <div class="relatorio-item">
+                        <span>Unidade:</span>
+                        <strong>${unidadeFormatada}</strong>
+                    </div>
+                    <div class="relatorio-item">
+                        <span>Custo por hora:</span>
+                        <strong>${formatarMoeda(CUSTO_HORA)}</strong>
+                    </div>
+                </div>
+            `;
+
+            // Seção 2: Detalhes por Destino
+            html += `<div class="relatorio-section"><h3>🚛 Detalhes por Destino</h3>`;
+
+            estado.destinos.forEach((destino, index) => {
+                const ciclosHora = 60 / destino.tempoMinutos;
+                const producaoHora = ciclosHora * destino.capacidade * (destino.eficiencia / 100);
+                const producaoNecessariaHora = destino.producao / totalHoras;
+                const equipamentosNecessarios = Math.ceil(producaoNecessariaHora / producaoHora);
+                const viagensNecessarias = Math.ceil(destino.producao / destino.capacidade);
+                const horasTotais = destino.producao / producaoHora;
+                const custoPorDestino = horasTotais * CUSTO_HORA;
+                const custoPorUnidade = custoPorDestino / destino.producao;
+
+                totalEquipamentosNecessarios += equipamentosNecessarios;
+
+                html += `
+                    <div style="background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <h4>${index + 1}. ${destino.nome}</h4>
+                        <div class="relatorio-item">
+                            <span>Produção requerida:</span>
+                            <strong>${destino.producao} ${unidadeFormatada}</strong>
+                        </div>
+                        <div class="relatorio-item">
+                            <span>Produção necessária por hora:</span>
+                            <strong>${producaoNecessariaHora.toFixed(2)} ${unidadeFormatada}/h</strong>
+                        </div>
+                        <div class="relatorio-item">
+                            <span>Ciclos por hora:</span>
+                            <strong>${ciclosHora.toFixed(2)}</strong>
+                        </div>
+                        <div class="relatorio-item">
+                            <span>Produção por equipamento/hora:</span>
+                            <strong>${producaoHora.toFixed(2)} ${unidadeFormatada}/h</strong>
+                        </div>
+                        <div class="relatorio-item">
+                            <span>Viagens necessárias:</span>
+                            <strong>${viagensNecessarias}</strong>
+                        </div>
+                        <div class="relatorio-item">
+                            <span>Horas totais:</span>
+                            <strong>${horasTotais.toFixed(2)}h</strong>
+                        </div>
+                        <div class="relatorio-item" style="color: #4caf50; font-weight: bold; margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+                            <span>Equipamentos NECESSÁRIOS:</span>
+                            <strong>${equipamentosNecessarios} 🚚</strong>
+                        </div>
+                        <div class="relatorio-item" style="color: #2196f3; font-weight: bold; margin-top: 5px;">
+                            <span>Custo da operação:</span>
+                            <strong>${formatarMoeda(custoPorDestino)}</strong>
+                        </div>
+                        <div class="relatorio-item" style="color: #ff9800; font-weight: bold; margin-top: 5px;">
+                            <span>Custo por ${unidadeFormatada}:</span>
+                            <strong>${formatarMoeda(custoPorUnidade)}</strong>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+
+            // Seção 3: Resumo Geral
+            const diferenca = totalEquipamentosNecessarios - estado.equipamentosDisponiveis;
+            let classResultado = 'resultado-box';
+            let mensagem = '';
+
+            if (diferenca > 0) {
+                classResultado += ' error';
+                mensagem = `⚠️ FALTAM ${diferenca} equipamento(s)`;
+            } else if (diferenca === 0) {
+                classResultado += '';
+                mensagem = `✅ PERFEITO! Você tem exatamente o que precisa!`;
+            } else {
+                classResultado += ' warning';
+                mensagem = `✅ SOBRAM ${Math.abs(diferenca)} equipamento(s)`;
+            }
+
+            // Calcular custo total
+            const custTotalOperacao = estado.destinos.reduce((total, destino) => {
+                const ciclosHora = 60 / destino.tempoMinutos;
+                const producaoHora = ciclosHora * destino.capacidade * (destino.eficiencia / 100);
+                const horasTotais = destino.producao / producaoHora;
+                return total + (horasTotais * CUSTO_HORA);
+            }, 0);
+
+            // Calcular custo por m³ (ou ton) TOTAL
+            const producaoTotal = estado.destinos.reduce((total, destino) => total + destino.producao, 0);
+            const custoPorUnidadeTotal = custTotalOperacao / producaoTotal;
+
+            html += `
+                <div class="relatorio-section">
+                    <h3>✅ Resumo Geral</h3>
+                    <div class="${classResultado}">
+                        <h4>${mensagem}</h4>
+                        <div class="relatorio-item">
+                            <span>Total de equipamentos NECESSÁRIOS:</span>
+                            <strong>${totalEquipamentosNecessarios} 🚚</strong>
+                        </div>
+                        <div class="relatorio-item">
+                            <span>Total de equipamentos DISPONÍVEIS:</span>
+                            <strong>${estado.equipamentosDisponiveis} 🚚</strong>
+                        </div>
+                        <div class="relatorio-item" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1);">
+                            <span>Diferença:</span>
+                            <strong>${Math.abs(diferenca)}</strong>
+                        </div>
+                    </div>
+
+                    <div class="custo-destaque">
+                        <h3>💰 Custo Total da Operação</h3>
+                        <div class="custo-valor">${formatarMoeda(custTotalOperacao)}</div>
+                        <p style="margin-top: 10px; opacity: 0.9;">Baseado em ${formatarMoeda(CUSTO_HORA)}/hora</p>
+                    </div>
+
+                    <div class="custo-por-unidade">
+                        <h3>📊 Custo por ${unidadeFormatada}</h3>
+                        <div class="custo-unidade-valor">${formatarMoeda(custoPorUnidadeTotal)}</div>
+                        <p style="margin-top: 10px; opacity: 0.9;">Custo médio por unidade produzida</p>
+                    </div>
+                </div>
+            `;
+
+            // Seção 4: Distribuição por Destino
+            html += `<div class="relatorio-section"><h3>📍 Distribuição de Equipamentos por Destino</h3>`;
+
+            estado.destinos.forEach((destino, index) => {
+                const ciclosHora = 60 / destino.tempoMinutos;
+                const producaoHora = ciclosHora * destino.capacidade * (destino.eficiencia / 100);
+                const producaoNecessariaHora = destino.producao / totalHoras;
+                const equipamentosNecessarios = Math.ceil(producaoNecessariaHora / producaoHora);
+
+                html += `
+                    <div class="relatorio-item">
+                        <span>${index + 1}. ${destino.nome}</span>
+                        <strong>${equipamentosNecessarios} 🚚</strong>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+
+            document.getElementById('relatorioContent').innerHTML = html;
+            showSection(4);
+        }
+
+        function resetarCalculadora() {
+            estado = {
+                tipoPrazo: null,
+                unidade: 'm3',
+                intervaloDias: 0,
+                horasTrabalhoDia: 0,
+                destinos: [],
+                equipamentosDisponiveis: 0
+            };
+
+            document.querySelectorAll('input[type="number"], input[type="text"], select').forEach(el => el.value = '');
+            document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelectorAll('.option-btn')[0].classList.add('selected');
+            document.querySelector('#bloco1 .option-btn').classList.add('selected');
+            document.getElementById('resumoBloco1').classList.add('hidden');
+            document.getElementById('listDestinos').innerHTML = '<p style="color: #999;">Nenhum destino adicionado ainda</p>';
+            document.getElementById('btnContinuarDestinos').disabled = true;
+            document.getElementById('eficienciaDestino').value = '80';
+
+            showSection(0);
+        }
+
+        // Inicialização
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.option-btn')[0].classList.add('selected');
+            document.querySelector('#bloco1 .option-btn').classList.add('selected');
+        });
+    </script>
+</body>
+</html>
