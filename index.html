@@ -556,7 +556,7 @@
                 </div>
 
                 <div class="info-text">
-                    💡 Selecione o destino e preencha os dados de produção e operação
+                    💡 Selecione o destino e preencha os dados de produ��ão e operação
                 </div>
 
                 <div class="form-group">
@@ -569,7 +569,13 @@
                         <option value="wetland_pde02">💧 Wetland 411 → PDE 02</option>
                         <option value="wetland_gold">💧 Wetland 411 → Área gold</option>
                         <option value="pde02_pdr">📍 PDE 02 → PDR Definitiva</option>
+                        <option value="outro">✏️ Outro (Digite um destino customizado)</option>
                     </select>
+                </div>
+
+                <div class="form-group" id="campoDestinoCustomizado" style="display: none;">
+                    <label>Nome do Destino (Customizado)</label>
+                    <input type="text" id="nomeDestinoCustomizado" placeholder="Ex: Depósito Central">
                 </div>
 
                 <div class="form-group">
@@ -819,6 +825,18 @@
         }
 
         function atualizarCamposDestino() {
+            const selectElement = document.getElementById('selectDestino');
+            const campoCustomizado = document.getElementById('campoDestinoCustomizado');
+            
+            // Mostrar/ocultar campo customizado
+            if (selectElement.value === 'outro') {
+                campoCustomizado.style.display = 'block';
+                document.getElementById('nomeDestinoCustomizado').focus();
+            } else {
+                campoCustomizado.style.display = 'none';
+                document.getElementById('nomeDestinoCustomizado').value = '';
+            }
+            
             document.getElementById('producaoDestino').value = '';
             document.getElementById('tempoDestino').value = '';
             document.getElementById('capacidadeDestino').value = '';
@@ -833,11 +851,24 @@
             const unidadeTempo = document.getElementById('unidadeTempoDestino').value;
             const capacidade = parseFloat(document.getElementById('capacidadeDestino').value);
             const eficiencia = parseFloat(document.getElementById('eficienciaDestino').value) || 80;
-            const destinoId = selectElement.value;
+            let destinoId = selectElement.value;
+            let nomeDestino = '';
 
             if (!destinoId) {
                 alert('Por favor, selecione um destino');
                 return;
+            }
+
+            // Validar destino customizado
+            if (destinoId === 'outro') {
+                nomeDestino = document.getElementById('nomeDestinoCustomizado').value.trim();
+                if (!nomeDestino) {
+                    alert('Por favor, digite o nome do destino customizado');
+                    return;
+                }
+                destinoId = `outro_${Date.now()}`; // ID único para cada destino customizado
+            } else {
+                nomeDestino = selectElement.options[selectElement.selectedIndex].text;
             }
 
             if (isNaN(producao) || producao <= 0) {
@@ -861,7 +892,6 @@
             }
 
             const tempoMinutos = unidadeTempo === 'h' ? tempo * 60 : tempo;
-            const nomeDestino = selectElement.options[selectElement.selectedIndex].text;
 
             const destino = {
                 id: destinoId,
@@ -905,10 +935,12 @@
 
         function limparFormDestino() {
             document.getElementById('selectDestino').value = '';
+            document.getElementById('nomeDestinoCustomizado').value = '';
             document.getElementById('producaoDestino').value = '';
             document.getElementById('tempoDestino').value = '';
             document.getElementById('capacidadeDestino').value = '';
             document.getElementById('eficienciaDestino').value = '80';
+            document.getElementById('campoDestinoCustomizado').style.display = 'none';
         }
 
         document.getElementById('equipamentosDisponiveis')?.addEventListener('change', function() {
@@ -1110,6 +1142,7 @@
             document.getElementById('listDestinos').innerHTML = '<p style="color: #999;">Nenhum destino adicionado ainda</p>';
             document.getElementById('btnContinuarDestinos').disabled = true;
             document.getElementById('eficienciaDestino').value = '80';
+            document.getElementById('campoDestinoCustomizado').style.display = 'none';
 
             showSection(0);
         }
